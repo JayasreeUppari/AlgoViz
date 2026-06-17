@@ -30,58 +30,48 @@ export default function LinkedListDisplay({ list, pointers = {} }) {
         findFirstReachableNode(list);
 
     const renderTraversal = () => {
-        if (!startId) {
-            return (
-                <div style={{ color: "red" }}>
-                    ⚠ No entry node found
-                </div>
-            );
-        }
+    if (!nodes || Object.keys(nodes).length === 0) {
+        return <div>No nodes</div>;
+    }
 
-        const result = [];
-        let current = startId;
-        const visited = new Set();
+    return Object.values(nodes).map((node) => {
+        const pointerNames = Object.keys(pointers)
+            .filter(name => pointers[name] === node.id);
 
-        while (current && nodes[current] && !visited.has(current)) {
-            visited.add(current);
-
-            const node = nodes[current];
-            const pointerNames = Object.keys(pointers)
-                .filter(name => pointers[name] === node.id);
-            result.push(
-                <div
-                    key={node.id}
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center"
-                    }}
-                >
-
-                    {pointerNames.map(name => (
-                        <div key={name}>
-                            {name}
-                            <br />
-                            ↓
-                        </div>
-                    ))}
-
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <div style={nodeStyle(true)}>
-                            {node.value}
-                        </div>
-
-                        <div style={{ margin: "0 8px" }}>→</div>
+        return (
+            <div
+                key={node.id}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginRight: "20px"
+                }}
+            >
+                {/* POINTERS */}
+                {pointerNames.map(name => (
+                    <div key={name} style={{ color: "blue" }}>
+                        {name} ↓
                     </div>
+                ))}
 
+                {/* NODE */}
+                <div style={nodeStyle(true)}>
+                    {node.value}
                 </div>
-            );
 
-            current = node.next;
-        }
+                {/* EDGE (only visual hint) */}
+                <div style={{ fontSize: "20px", color: "#888" }}>
+                    →
+                </div>
 
-        return result;
-    };
+                <div style={{ fontSize: "12px", color: "#aaa" }}>
+                    next: {node.next ?? "null"}
+                </div>
+            </div>
+        );
+    });
+};
 
     const renderMemory = () => {
         return Object.values(nodes).map((node) => (

@@ -1,12 +1,15 @@
 export function parseCode(code) {
     const lines = code
         .split("\n")
-        .map(line => line.trim())
+        .map(l => l.trim())
         .filter(Boolean);
 
     const events = [];
 
-    lines.forEach(line => {
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
 
         // ======================
         // ARRAY
@@ -24,10 +27,11 @@ export function parseCode(code) {
             events.push({
                 type: "CREATE",
                 target: "array",
-                payload: {
-                    value: values
-                }
+                payload: { value: values }
             });
+
+            i++;
+            continue;
         }
 
         // ======================
@@ -45,6 +49,9 @@ export function parseCode(code) {
                     value: Number(value)
                 }
             });
+
+            i++;
+            continue;
         }
 
         // ======================
@@ -56,6 +63,9 @@ export function parseCode(code) {
                 target: "stack",
                 payload: {}
             });
+
+            i++;
+            continue;
         }
 
         if (line.startsWith("PUSH")) {
@@ -69,16 +79,20 @@ export function parseCode(code) {
                     value: Number(value)
                 }
             });
+
+            i++;
+            continue;
         }
 
         if (line === "POP") {
             events.push({
                 type: "MUTATE",
                 target: "stack",
-                payload: {
-                    op: "POP"
-                }
+                payload: { op: "POP" }
             });
+
+            i++;
+            continue;
         }
 
         // ======================
@@ -90,6 +104,9 @@ export function parseCode(code) {
                 target: "queue",
                 payload: {}
             });
+
+            i++;
+            continue;
         }
 
         if (line.startsWith("ENQUEUE")) {
@@ -103,39 +120,46 @@ export function parseCode(code) {
                     value: Number(value)
                 }
             });
+
+            i++;
+            continue;
         }
 
         if (line === "DEQUEUE") {
             events.push({
                 type: "MUTATE",
                 target: "queue",
-                payload: {
-                    op: "DEQUEUE"
-                }
+                payload: { op: "DEQUEUE" }
             });
+
+            i++;
+            continue;
         }
 
         // ======================
         // SWAP
         // ======================
         if (line.startsWith("SWAP")) {
-            const [, i, j] = line.split(" ");
+            const [, a, b] = line.split(" ");
 
             events.push({
                 type: "MUTATE",
                 target: "array",
                 payload: {
                     op: "SWAP",
-                    i: Number(i),
-                    j: Number(j)
+                    i: Number(a),
+                    j: Number(b)
                 }
             });
+
+            i++;
+            continue;
         }
 
         // ======================
         // POINTERS
         // ======================
-        if (line.startsWith("POINTER")) {
+        if (line.startsWith("POINTER") || line.startsWith("MOVE")) {
             const [, name, index] = line.split(" ");
 
             events.push({
@@ -146,19 +170,9 @@ export function parseCode(code) {
                     position: Number(index)
                 }
             });
-        }
 
-        if (line.startsWith("MOVE")) {
-            const [, name, index] = line.split(" ");
-
-            events.push({
-                type: "POINTER",
-                target: "array",
-                payload: {
-                    name,
-                    position: Number(index)
-                }
-            });
+            i++;
+            continue;
         }
 
         // ======================
@@ -175,17 +189,24 @@ export function parseCode(code) {
                     b: Number(b)
                 }
             });
+
+            i++;
+            continue;
         }
+
+        // ======================
+        // LINKED LIST
+        // ======================
         if (line.startsWith("LIST_CREATE")) {
             const [, id, value] = line.split(" ");
 
             events.push({
                 type: "LIST_CREATE",
-                payload: {
-                    id,
-                    value: Number(value)
-                }
+                payload: { id, value: Number(value) }
             });
+
+            i++;
+            continue;
         }
 
         if (line.startsWith("LIST_LINK")) {
@@ -195,6 +216,9 @@ export function parseCode(code) {
                 type: "LIST_LINK",
                 payload: { from, to }
             });
+
+            i++;
+            continue;
         }
 
         if (line.startsWith("LIST_HEAD")) {
@@ -204,7 +228,11 @@ export function parseCode(code) {
                 type: "LIST_HEAD",
                 payload: { id }
             });
+
+            i++;
+            continue;
         }
+
         if (line.startsWith("LIST_POINTER")) {
             const [, name, nodeId] = line.split(" ");
 
@@ -215,7 +243,14 @@ export function parseCode(code) {
                     position: nodeId
                 }
             });
+
+            i++;
+            continue;
         }
+
+        // ======================
+        // VARIABLES
+        // ======================
         if (line.startsWith("VAR")) {
             const [, name, value] = line.split(" ");
 
@@ -226,7 +261,11 @@ export function parseCode(code) {
                     value: Number(value)
                 }
             });
+
+            i++;
+            continue;
         }
+
         if (line.startsWith("SET")) {
             const [, name, value] = line.split(" ");
 
@@ -237,8 +276,47 @@ export function parseCode(code) {
                     value: Number(value)
                 }
             });
+
+            i++;
+            continue;
         }
-    });
+
+        // ======================
+        // FOR LOOP UNROLLING
+        // ======================
+        if (line.startsWith("FOR")) {
+            const [, varName, startStr, endStr] = line.split(" ");
+
+            const start = Number(startStr);
+            const end = Number(endStr);
+
+            const body = [];
+
+            i++; // move inside loop
+
+            while (i < lines.length && lines[i] !== "END") {
+                body.push(lines[i]);
+                i++;
+            }
+
+            i++; // skip END
+
+            for (let v = start; v <= end; v++) {
+
+                const substituted = body.map(b =>
+                    b.replaceAll(varName, v)
+                );
+
+                const subEvents = parseCode(substituted.join("\n"));
+                events.push(...subEvents);
+            }
+
+            continue;
+        }
+
+        // fallback (unknown line)
+        i++;
+    }
 
     return events;
 }
