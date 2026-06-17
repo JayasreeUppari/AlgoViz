@@ -1,0 +1,14 @@
+// // src/core/eventTypes.js
+
+// export const EVENT_TYPES = {
+//   ARRAY_CREATE: "ARRAY_CREATE",
+//   ARRAY_UPDATE: "ARRAY_UPDATE",
+
+//   STACK_CREATE: "STACK_CREATE",
+//   STACK_PUSH: "STACK_PUSH",
+//   STACK_POP: "STACK_POP",
+
+//   QUEUE_CREATE: "QUEUE_CREATE",
+//   QUEUE_ENQUEUE: "QUEUE_ENQUEUE",
+//   QUEUE_DEQUEUE: "QUEUE_DEQUEUE",
+// };
