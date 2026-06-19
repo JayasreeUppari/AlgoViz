@@ -1,11 +1,13 @@
-export function parseCode(code) {
+import StackDisplay from "../components/visualizers/StackDisplay";
+
+export function replayExecution(code) {
     const lines = code
         .split("\n")
         .map(l => l.trim())
         .filter(Boolean);
 
     const events = [];
-
+    const variablesContext = {}
     let i = 0;
 
     while (i < lines.length) {
@@ -251,11 +253,14 @@ export function parseCode(code) {
         // ======================
         // VARIABLES
         // ======================
-        if (line.startsWith("VAR")) {
+
+        if (line.startsWith("DECLARE")) {
             const [, name, value] = line.split(" ");
 
+            variablesContext[name] = Number(value);
+
             events.push({
-                type: "VAR",
+                type: "DECLARE_VAR",
                 payload: {
                     name,
                     value: Number(value)
@@ -269,6 +274,8 @@ export function parseCode(code) {
         if (line.startsWith("SET")) {
             const [, name, value] = line.split(" ");
 
+            variablesContext[name] = Number(value);
+
             events.push({
                 type: "SET_VAR",
                 payload: {
@@ -280,39 +287,90 @@ export function parseCode(code) {
             i++;
             continue;
         }
-
         // ======================
-        // FOR LOOP UNROLLING
+        // BRANCHES
         // ======================
-        if (line.startsWith("FOR")) {
-            const [, varName, startStr, endStr] = line.split(" ");
 
-            const start = Number(startStr);
-            const end = Number(endStr);
+        if (line === "ENTER_IF") {
 
-            const body = [];
+            events.push({
+                type: "ENTER_IF"
+            });
 
-            i++; // move inside loop
-
-            while (i < lines.length && lines[i] !== "END") {
-                body.push(lines[i]);
-                i++;
-            }
-
-            i++; // skip END
-
-            for (let v = start; v <= end; v++) {
-
-                const substituted = body.map(b =>
-                    b.replaceAll(varName, v)
-                );
-
-                const subEvents = parseCode(substituted.join("\n"));
-                events.push(...subEvents);
-            }
-
+            i++;
             continue;
         }
+
+        if (line === "EXIT_IF") {
+
+            events.push({
+                type: "EXIT_IF"
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line === "ENTER_ELSE") {
+
+            events.push({
+                type: "ENTER_ELSE"
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line === "EXIT_ELSE") {
+
+            events.push({
+                type: "EXIT_ELSE"
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // CALL STACK
+        // ======================
+        if (line.startsWith("CALL")) {
+
+            const tokens = line.split(" ");
+
+            const functionName = tokens[1];
+
+            const params = {};
+
+            for (let j = 2; j < tokens.length; j++) {
+
+                const [key, value] = tokens[j].split("=");
+
+                params[key] = value;
+            }
+
+            events.push({
+                type: "CALL",
+                payload: {
+                    functionName,
+                    params
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line === "RETURN") {
+
+            events.push({
+                type: "RETURN"
+            });
+
+            i++;
+            continue;
+        }
+
+
+
 
         // fallback (unknown line)
         i++;

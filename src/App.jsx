@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { parseCode } from "./core/parser";
+import { replayExecution } from "./core/replayEngine";
 import { getStateAt, getMessage } from "./core/stateEngine";
 
 import ArrayDisplay from "./components/visualizers/ArrayDisplay";
@@ -12,8 +12,7 @@ import "./styles/App.css";
 
 export default function App() {
   const [code, setCode] = useState(`ARRAY [5,3,8]
-VAR low 0
-VAR high 2
+
 `);
 
   const [steps, setSteps] = useState([]);
@@ -57,7 +56,7 @@ VAR high 2
   // GENERATE DSL → EVENTS
   // =========================
   function generateVisualization() {
-    const events = parseCode(code);
+    const events = replayExecution(code);
 
     console.log(events);
 
@@ -73,13 +72,6 @@ VAR high 2
     intervalRef.current = setInterval(() => {
       setCurrent((prev) => {
         if (prev >= steps.length - 1) {
-          setPlaying(false);
-          return prev;
-        }
-
-        const event = steps[prev];
-
-        if (event?.type === "BREAK" || event?.type === "RETURN") {
           setPlaying(false);
           return prev;
         }

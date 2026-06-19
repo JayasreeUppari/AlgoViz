@@ -1,0 +1,83 @@
+.call-stack {
+    width: 290px;
+    background: #fff;
+    border: 1px solid #dbe4ef;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 8px 18px rgba(0,0,0,.08);
+}
+
+.current-execution {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.exec-label {
+    font-size: 12px;
+    opacity: .85;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.exec-name {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: Consolas, monospace;
+}
+
+.call-stack h3 {
+    margin: 0;
+    color: #374151;
+    font-size: 18px;
+}
+
+.frame {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-left: 5px solid #94a3b8;
+    border-radius: 10px;
+    padding: 10px;
+    transition: .25s;
+}
+
+.active-frame {
+    border-left-color: #22c55e;
+    background: #ecfdf5;
+    box-shadow: 0 0 0 2px rgba(34,197,94,.15);
+}
+
+.frame-title {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.active-frame .frame-title::after {
+    content: "ACTIVE";
+    font-size: 11px;
+    background: #22c55e;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+
+.param {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.param span:last-child {
+    font-weight: 600;
+    color: #111827;
+}

@@ -60,6 +60,7 @@ export function getStateAt(events = [], currentStep = 0) {
 
     for (let i = 0; i <= currentStep && i < events.length; i++) {
         const event = events[i];
+        console.log(i, events[i].type);
         if (!event) continue;
 
         switch (event.type) {
@@ -162,7 +163,7 @@ export function getStateAt(events = [], currentStep = 0) {
                 state.pointers[event.payload.name] = event.payload.position;
                 break;
             }
-            case "VAR":
+            case "DECLARE_VAR":
                 state.variables[event.payload.name] =
                     event.payload.value;
                 break;
@@ -170,9 +171,19 @@ export function getStateAt(events = [], currentStep = 0) {
                 state.variables[event.payload.name] =
                     event.payload.value;
                 break;
+            case "CALL":
+                state.callStack.push({
+                    functionName: event.payload.functionName,
+                    params: event.payload.params || {}
+                });
+                break;
+
+            case "RETURN":
+                state.callStack.pop();
+                break;
         }
     }
-    console.log("POINTERS:", state.pointers);
+    console.log("Finished replay");
 
     return state;
 }
