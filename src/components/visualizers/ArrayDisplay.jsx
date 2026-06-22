@@ -26,7 +26,7 @@ export default function ArrayDisplay({
         }}
       >
         {displayArray.map((value, idx) => {
-          console.log(idx, displayPointers);
+
           const isCompare =
             displayHighlights?.compare?.includes(idx);
 

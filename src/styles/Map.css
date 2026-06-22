@@ -1,0 +1,13 @@
+.hashmap-container {
+    margin: 20px 0;
+}
+
+.hashmap-table {
+    border-collapse: collapse;
+}
+
+.hashmap-table td,
+.hashmap-table th {
+    border: 1px solid #999;
+    padding: 8px 15px;
+}

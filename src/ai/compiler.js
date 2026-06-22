@@ -7,7 +7,7 @@ export async function compileCode(javaCode) {
     throw new Error("Failed to generate DSL");
   }
 
-  console.log(`Generated using: ${result.provider}`);
+  
 
   return result.dsl.trim();
 }

@@ -8,10 +8,18 @@ import QueueDisplay from "./components/visualizers/QueueDisplay";
 import LinkedListDisplay from "./components/visualizers/LinkedListDisplay";
 import VariablesDisplay from "./components/visualizers/VariablesDisplay";
 import CallStackDisplay from "./components/visualizers/CallStackDisplay";
+import HashMapDisplay from "./components/visualizers/HashMapDisplay";
+import HashSetDisplay from "./components/visualizers/HashSetDisplay";
+import TreeDisplay from "./components/visualizers/TreeDisplay";
 import "./styles/App.css";
 
 export default function App() {
-  const [code, setCode] = useState(`ARRAY [5,3,8]
+  const [code, setCode] = useState(`TREE_NODE A 10
+TREE_ROOT A
+TREE_NODE B 20
+TREE_HIGHLIGHT A
+TREE_HIGHLIGHT B
+TREE_UNHIGHLIGHT A
 
 `);
 
@@ -19,15 +27,14 @@ export default function App() {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
-  const [loading, setLoading] = useState(false);
+
 
   const intervalRef = useRef(null);
 
   // =========================
   // SNAPSHOT ENGINE
   // =========================
-  console.log("steps =", steps);
-  console.log("current =", current);
+
   const rawState = getStateAt(steps, current) || {};
 
   const state = {
@@ -38,7 +45,15 @@ export default function App() {
     stack: rawState.stack || [],
     queue: rawState.queue || [],
 
-    list: rawState.list || { nodes: {} },
+    list: rawState.list || {
+      nodes: {},
+      head: null
+    },
+
+    tree: rawState.tree || {
+      nodes: {},
+      root: null
+    },
 
     pointers: rawState.pointers || {},
 
@@ -47,7 +62,10 @@ export default function App() {
       swap: [],
       visit: [],
       active: []
-    }
+    },
+
+    hashMap: rawState.hashMap || {},
+    hashSet: rawState.hashSet || {}
   };
 
   const currentEvent = steps[current];
@@ -58,9 +76,8 @@ export default function App() {
   function generateVisualization() {
     const events = replayExecution(code);
 
-    console.log(events);
-
     setSteps(events);
+    setCurrent(0);
   }
 
   // =========================
@@ -94,14 +111,19 @@ export default function App() {
   };
 
   const next = () =>
-    setCurrent((p) => Math.min(p + 1, steps.length - 1));
+    setCurrent((prev) =>
+      Math.min(prev + 1, steps.length - 1)
+    );
 
   const prev = () =>
-    setCurrent((p) => Math.max(p - 1, 0));
-  { console.log(state.variables) }
+    setCurrent((prev) =>
+      Math.max(prev - 1, 0)
+    );
   // =========================
   // UI
   // =========================
+
+
   return (
     <div className="app">
 
@@ -156,9 +178,7 @@ export default function App() {
       </div>
 
       {/* STATUS */}
-      {loading && (
-        <p>Generating visualization...</p>
-      )}
+
 
       <div className="status">
         <p>
@@ -172,9 +192,19 @@ export default function App() {
         </p>
       </div>
 
+
       {/* VISUALIZER */}
       <div className="visualizer">
+        <h3>Tree</h3>
 
+        <TreeDisplay tree={state.tree}
+          highlights={state.highlights} />
+
+        <h3>HashMap</h3>
+        <HashMapDisplay maps={state.hashMap} />
+        <h3>HashSet</h3>
+
+        <HashSetDisplay sets={state.hashSet} />
         <h3>Variables</h3>
         <VariablesDisplay variables={state.variables} />
 

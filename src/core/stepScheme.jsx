@@ -28,8 +28,8 @@ export const createStep = ({
   },
 
   tree = {
-    nodes: [],
-    edges: []
+    root: null,
+    nodes: {}
   },
 
   graph = {

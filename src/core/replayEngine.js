@@ -10,6 +10,9 @@ export function replayExecution(code) {
     const variablesContext = {}
     let i = 0;
 
+    const line = lines[i];
+
+
     while (i < lines.length) {
         const line = lines[i];
 
@@ -271,7 +274,7 @@ export function replayExecution(code) {
             continue;
         }
 
-        if (line.startsWith("SET")) {
+        if (line.startsWith("SET ")) {
             const [, name, value] = line.split(" ");
 
             variablesContext[name] = Number(value);
@@ -368,8 +371,227 @@ export function replayExecution(code) {
             i++;
             continue;
         }
+        // ======================
+        // HASHMAP
+        // ======================
+        if (line.startsWith("HASHMAP")) {
+            const [, name] = line.split(" ");
 
+            events.push({
+                type: "CREATE",
+                target: "hashMap",
+                payload: {
+                    name
+                }
+            });
 
+            i++;
+            continue;
+        }
+        if (line.startsWith("MAP_PUT")) {
+            const [, mapName, key, value] = line.split(" ");
+
+            events.push({
+                type: "MAP_PUT",
+                target: "hashMap",
+                payload: {
+                    map: mapName,
+                    key,
+                    value: isNaN(value) ? value : Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("MAP_REMOVE")) {
+            const [, mapName, key] = line.split(" ");
+
+            events.push({
+                type: "MAP_REMOVE",
+                target: "hashMap",
+                payload: {
+                    map: mapName,
+                    key
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // HASHSET
+        // ======================
+        if (line.startsWith("HASHSET")) {
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "CREATE",
+                target: "hashSet",
+                payload: {
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("SET_ADD")) {
+            const [, setName, value] = line.split(" ");
+
+            events.push({
+                type: "SET_ADD",
+                target: "hashSet",
+                payload: {
+                    set: setName,
+                    value: isNaN(value) ? value : Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("SET_REMOVE")) {
+            const [, setName, value] = line.split(" ");
+
+            events.push({
+                type: "SET_REMOVE",
+                target: "hashSet",
+                payload: {
+                    set: setName,
+                    value: isNaN(value) ? value : Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // TREE
+        // ======================
+
+        if (line.startsWith("TREE_NODE")) {
+            const [, id, value] = line.split(" ");
+
+            events.push({
+                type: "TREE_NODE",
+                payload: {
+                    id,
+                    value: Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_ROOT")) {
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "TREE_ROOT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_CONNECT")) {
+            const [, parent, child, side] = line.split(" ");
+
+            events.push({
+                type: "TREE_CONNECT",
+                payload: {
+                    parent,
+                    child,
+                    side
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_DISCONNECT")) {
+            const [, parent, side] = line.split(" ");
+
+            events.push({
+                type: "TREE_DISCONNECT",
+                payload: {
+                    parent,
+                    side
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_DELETE")) {
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "TREE_DELETE",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_UPDATE_VAL")) {
+            const [, id, value] = line.split(" ");
+
+            events.push({
+                type: "TREE_UPDATE_VAL",
+                payload: {
+                    id,
+                    value: Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_VISIT")) {
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "TREE_VISIT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_HIGHLIGHT")) {
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "TREE_HIGHLIGHT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+        if (line.startsWith("TREE_UNHIGHLIGHT")) {
+    const [, id] = line.split(" ");
+
+    events.push({
+        type: "TREE_UNHIGHLIGHT",
+        payload: {
+            id
+        }
+    });
+
+    i++;
+    continue;
+}
 
 
         // fallback (unknown line)

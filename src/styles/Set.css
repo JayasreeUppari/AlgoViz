@@ -1,0 +1,17 @@
+.hashset-container {
+    margin: 20px 0;
+}
+
+.hashset-values {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hashset-item {
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 10px 15px;
+    min-width: 40px;
+    text-align: center;
+}
