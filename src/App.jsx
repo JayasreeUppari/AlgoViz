@@ -11,16 +11,49 @@ import CallStackDisplay from "./components/visualizers/CallStackDisplay";
 import HashMapDisplay from "./components/visualizers/HashMapDisplay";
 import HashSetDisplay from "./components/visualizers/HashSetDisplay";
 import TreeDisplay from "./components/visualizers/TreeDisplay";
+import GraphDisplay from "./components/visualizers/GraphDisplay";
 import "./styles/App.css";
 
 export default function App() {
-  const [code, setCode] = useState(`TREE_NODE A 10
-TREE_ROOT A
-TREE_NODE B 20
-TREE_HIGHLIGHT A
-TREE_HIGHLIGHT B
-TREE_UNHIGHLIGHT A
+  const [code, setCode] = useState(`GRAPH_START
 
+GRAPH_NODE A 10
+GRAPH_NODE B 20
+GRAPH_NODE C 30
+GRAPH_NODE D 40
+
+GRAPH_CONNECT A B
+GRAPH_CONNECT B C
+GRAPH_CONNECT C D
+GRAPH_CONNECT D A
+GRAPH_CONNECT A C 5
+
+GRAPH_VISIT A
+GRAPH_VISIT C
+
+GRAPH_HIGHLIGHT_NODE B
+GRAPH_HIGHLIGHT_EDGE A C
+
+GRAPH_COLOR_NODE C green
+GRAPH_COLOR_NODE D orange
+
+GRAPH_COLOR_EDGE A B blue
+GRAPH_COLOR_EDGE C D red
+
+GRAPH_UPDATE_VAL B 99
+GRAPH_UPDATE_WEIGHT A C 12
+
+GRAPH_UNHIGHLIGHT_NODE B
+GRAPH_UNHIGHLIGHT_EDGE A C
+
+GRAPH_UNVISIT C
+
+GRAPH_RESET_NODE_COLOR D
+GRAPH_RESET_EDGE_COLOR C D
+
+GRAPH_DISCONNECT D A
+
+GRAPH_DELETE B
 `);
 
   const [steps, setSteps] = useState([]);
@@ -54,7 +87,10 @@ TREE_UNHIGHLIGHT A
       nodes: {},
       root: null
     },
-
+    graph: rawState.graph || {
+      nodes: {},
+      edges: []
+    },
     pointers: rawState.pointers || {},
 
     highlights: rawState.highlights || {
@@ -195,6 +231,11 @@ TREE_UNHIGHLIGHT A
 
       {/* VISUALIZER */}
       <div className="visualizer">
+        <h3>Graph</h3>
+        {console.log(state.graph)}
+
+        <GraphDisplay graph={state.graph} />
+
         <h3>Tree</h3>
 
         <TreeDisplay tree={state.tree}

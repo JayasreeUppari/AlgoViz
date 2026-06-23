@@ -1,0 +1,25 @@
+.graph-container {
+
+    width: 700px;
+
+    height: 500px;
+
+    border: 1px solid #ccc;
+
+    margin: 20px auto;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+.graph-svg {
+
+    width: 700px;
+
+    height: 500px;
+
+}

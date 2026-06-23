@@ -580,19 +580,307 @@ export function replayExecution(code) {
             continue;
         }
         if (line.startsWith("TREE_UNHIGHLIGHT")) {
-    const [, id] = line.split(" ");
+            const [, id] = line.split(" ");
 
-    events.push({
-        type: "TREE_UNHIGHLIGHT",
-        payload: {
-            id
+            events.push({
+                type: "TREE_UNHIGHLIGHT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
         }
-    });
+        // =====================
+        // GRAPHS
+        // =====================
 
-    i++;
-    continue;
-}
+        if (line.startsWith("GRAPH_START")) {
 
+            events.push({
+                type: "GRAPH_START",
+                payload: {}
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_NODE")) {
+
+            const [, id, value] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_NODE",
+                payload: {
+                    id,
+                    value
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_CONNECT")) {
+
+            const parts = line.split(" ");
+
+            const from = parts[1];
+            const to = parts[2];
+            const weight = parts.length > 3 && parts[3] !== "null"
+                ? Number(parts[3])
+                : null;
+
+            const directed = parts.length > 4
+                ? parts[4] === "true"
+                : false;
+
+            events.push({
+                type: "GRAPH_CONNECT",
+                payload: {
+                    from,
+                    to,
+                    weight,
+                    directed
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_DISCONNECT")) {
+
+            const [, from, to] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_DISCONNECT",
+                payload: {
+                    from,
+                    to
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_DELETE")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_DELETE",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_VISIT")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_VISIT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_UNVISIT")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_UNVISIT",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_HIGHLIGHT_NODE")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_HIGHLIGHT_NODE",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_UNHIGHLIGHT_NODE")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_UNHIGHLIGHT_NODE",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_HIGHLIGHT_EDGE")) {
+
+            const [, from, to] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_HIGHLIGHT_EDGE",
+                payload: {
+                    from,
+                    to
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_UNHIGHLIGHT_EDGE")) {
+
+            const [, from, to] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_UNHIGHLIGHT_EDGE",
+                payload: {
+                    from,
+                    to
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_UPDATE_VAL")) {
+
+            const [, id, value] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_UPDATE_VAL",
+                payload: {
+                    id,
+                    value
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_UPDATE_WEIGHT")) {
+
+            const [, from, to, weight] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_UPDATE_WEIGHT",
+                payload: {
+                    from,
+                    to,
+                    weight: Number(weight)
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_COLOR_NODE")) {
+
+            const [, id, color] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_COLOR_NODE",
+                payload: {
+                    id,
+                    color
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_COLOR_EDGE")) {
+
+            const [, from, to, color] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_COLOR_EDGE",
+                payload: {
+                    from,
+                    to,
+                    color
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_RESET_NODE_COLOR")) {
+
+            const [, id] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_RESET_NODE_COLOR",
+                payload: {
+                    id
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_RESET_EDGE_COLOR")) {
+
+            const [, from, to] = line.split(" ");
+
+            events.push({
+                type: "GRAPH_RESET_EDGE_COLOR",
+                payload: {
+                    from,
+                    to
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("GRAPH_CLEAR")) {
+
+            events.push({
+                type: "GRAPH_CLEAR",
+                payload: {}
+            });
+
+            i++;
+            continue;
+        }
 
         // fallback (unknown line)
         i++;

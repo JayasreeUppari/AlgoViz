@@ -45,7 +45,7 @@ export function getStateAt(events = [], currentStep = 0) {
         },
 
         graph: {
-            nodes: [],
+            nodes: {},
             edges: []
         },
 
@@ -235,26 +235,26 @@ export function getStateAt(events = [], currentStep = 0) {
 
             case "TREE_CONNECT": {
 
-    const { parent, child, side } = event.payload;
+                const { parent, child, side } = event.payload;
 
-    // Remove child from any old parent
-    Object.values(state.tree.nodes).forEach(node => {
+                // Remove child from any old parent
+                Object.values(state.tree.nodes).forEach(node => {
 
-        if (node.left === child)
-            node.left = null;
+                    if (node.left === child)
+                        node.left = null;
 
-        if (node.right === child)
-            node.right = null;
-    });
+                    if (node.right === child)
+                        node.right = null;
+                });
 
-    // Connect to new parent
-    if (side === "left")
-        state.tree.nodes[parent].left = child;
-    else
-        state.tree.nodes[parent].right = child;
+                // Connect to new parent
+                if (side === "left")
+                    state.tree.nodes[parent].left = child;
+                else
+                    state.tree.nodes[parent].right = child;
 
-    break;
-}
+                break;
+            }
 
             case "TREE_DISCONNECT":
                 state.tree.nodes[event.payload.parent][event.payload.side] =
@@ -263,26 +263,26 @@ export function getStateAt(events = [], currentStep = 0) {
 
             case "TREE_DELETE": {
 
-    const id = event.payload.id;
+                const id = event.payload.id;
 
-    // Remove references from all parents
-    Object.values(state.tree.nodes).forEach(node => {
+                // Remove references from all parents
+                Object.values(state.tree.nodes).forEach(node => {
 
-        if (node.left === id)
-            node.left = null;
+                    if (node.left === id)
+                        node.left = null;
 
-        if (node.right === id)
-            node.right = null;
-    });
+                    if (node.right === id)
+                        node.right = null;
+                });
 
-    // Remove root if necessary
-    if (state.tree.root === id)
-        state.tree.root = null;
+                // Remove root if necessary
+                if (state.tree.root === id)
+                    state.tree.root = null;
 
-    delete state.tree.nodes[id];
+                delete state.tree.nodes[id];
 
-    break;
-}
+                break;
+            }
 
             case "TREE_UPDATE_VAL":
                 state.tree.nodes[event.payload.id].value =
@@ -305,6 +305,160 @@ export function getStateAt(events = [], currentStep = 0) {
                         id => id !== event.payload.id
                     );
                 break;
+
+            // =====================
+            // GRAPHS
+            // =====================
+
+            case "GRAPH_START":
+                state.graph = {
+                    nodes: {},
+                    edges: []
+                };
+                break;
+
+            case "GRAPH_NODE":
+                state.graph.nodes[event.payload.id] = {
+                    value: event.payload.value,
+                    visited: false,
+                    highlighted: false,
+                    color: null
+                };
+                break;
+
+            case "GRAPH_CONNECT":
+                state.graph.edges.push({
+                    from: event.payload.from,
+                    to: event.payload.to,
+                    weight: event.payload.weight ?? null,
+                    directed: event.payload.directed ?? false,
+                    highlighted: false,
+                    color: null
+                });
+                break;
+
+            case "GRAPH_DISCONNECT":
+                state.graph.edges = state.graph.edges.filter(
+                    edge =>
+                        !(edge.from === event.payload.from &&
+                            edge.to === event.payload.to)
+                );
+                break;
+
+            case "GRAPH_DELETE":
+                delete state.graph.nodes[event.payload.id];
+
+                state.graph.edges = state.graph.edges.filter(
+                    edge =>
+                        edge.from !== event.payload.id &&
+                        edge.to !== event.payload.id
+                );
+                break;
+
+            case "GRAPH_VISIT":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].visited = true;
+                }
+                break;
+
+            case "GRAPH_UNVISIT":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].visited = false;
+                }
+                break;
+
+            case "GRAPH_HIGHLIGHT_NODE":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].highlighted = true;
+                }
+                break;
+
+            case "GRAPH_UNHIGHLIGHT_NODE":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].highlighted = false;
+                }
+                break;
+
+            case "GRAPH_HIGHLIGHT_EDGE":
+                state.graph.edges.forEach(edge => {
+                    if (
+                        edge.from === event.payload.from &&
+                        edge.to === event.payload.to
+                    ) {
+                        edge.highlighted = true;
+                    }
+                });
+                break;
+
+            case "GRAPH_UNHIGHLIGHT_EDGE":
+                state.graph.edges.forEach(edge => {
+                    if (
+                        edge.from === event.payload.from &&
+                        edge.to === event.payload.to
+                    ) {
+                        edge.highlighted = false;
+                    }
+                });
+                break;
+
+            case "GRAPH_UPDATE_VAL":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].value = event.payload.value;
+                }
+                break;
+
+            case "GRAPH_UPDATE_WEIGHT":
+                state.graph.edges.forEach(edge => {
+                    if (
+                        edge.from === event.payload.from &&
+                        edge.to === event.payload.to
+                    ) {
+                        edge.weight = event.payload.weight;
+                    }
+                });
+                break;
+
+            case "GRAPH_COLOR_NODE":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].color = event.payload.color;
+                }
+                break;
+
+            case "GRAPH_COLOR_EDGE":
+                state.graph.edges.forEach(edge => {
+                    if (
+                        edge.from === event.payload.from &&
+                        edge.to === event.payload.to
+                    ) {
+                        edge.color = event.payload.color;
+                    }
+                });
+                break;
+
+            case "GRAPH_RESET_NODE_COLOR":
+                if (state.graph.nodes[event.payload.id]) {
+                    state.graph.nodes[event.payload.id].color = null;
+                }
+                break;
+
+            case "GRAPH_RESET_EDGE_COLOR":
+                state.graph.edges.forEach(edge => {
+                    if (
+                        edge.from === event.payload.from &&
+                        edge.to === event.payload.to
+                    ) {
+                        edge.color = null;
+                    }
+                });
+                break;
+
+            case "GRAPH_CLEAR":
+                state.graph = {
+                    nodes: {},
+                    edges: []
+                };
+                break;
+            
         }
     }
 
