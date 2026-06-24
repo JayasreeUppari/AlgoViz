@@ -1,0 +1,61 @@
+.matrix-container{
+    margin:25px 0;
+}
+
+.matrix-title{
+    margin-bottom:15px;
+    text-align:center;
+}
+
+.matrix-table{
+    border-collapse:collapse;
+    margin:auto;
+}
+
+.corner-cell{
+    border:none;
+    width:55px;
+}
+
+.matrix-index{
+
+    width:55px;
+    height:55px;
+
+    background:#4f6ef7;
+    color:white;
+
+    border:2px solid #4f6ef7;
+
+    font-weight:bold;
+    text-align:center;
+}
+
+.active-index{
+
+    background:#ff9800;
+    border-color:#ff9800;
+}
+
+.matrix-cell{
+
+    width:60px;
+    height:60px;
+
+    border:2px solid #666;
+
+    text-align:center;
+    vertical-align:middle;
+
+    font-size:18px;
+    font-weight:bold;
+
+    background:white;
+
+    transition:.25s;
+}
+
+.highlighted{
+
+    background:#ffe066;
+}

@@ -881,7 +881,105 @@ export function replayExecution(code) {
             i++;
             continue;
         }
+        // ======================
+        // MATRIX
+        // ======================
+        if (line.startsWith("MATRIX_CREATE")) {
+            const [, name, rows, cols] = line.split(" ");
 
+            events.push({
+                type: "CREATE",
+                target: "matrix",
+                payload: {
+                    name,
+                    rows: Number(rows),
+                    cols: Number(cols)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // MATRIX SET
+        // ======================
+        if (line.startsWith("MATRIX_SET")) {
+            const [, name, row, col, value] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                target: "matrix",
+                payload: {
+                    op: "SET",
+                    name,
+                    row: Number(row),
+                    col: Number(col),
+                    value: Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // MATRIX GET
+        // ======================
+        if (line.startsWith("MATRIX_GET")) {
+            const [, name, row, col] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                target: "matrix",
+                payload: {
+                    op: "GET",
+                    name,
+                    row: Number(row),
+                    col: Number(col)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // MATRIX HIGHLIGHT
+        // ======================
+        if (line.startsWith("MATRIX_HIGHLIGHT")) {
+            const [, name, row, col] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                target: "matrix",
+                payload: {
+                    op: "HIGHLIGHT",
+                    name,
+                    row: Number(row),
+                    col: Number(col)
+                }
+            });
+
+            i++;
+            continue;
+        }
+        // ======================
+        // MATRIX UNHIGHLIGHT
+        // ======================
+        if (line.startsWith("MATRIX_UNHIGHLIGHT")) {
+
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                target: "matrix",
+                payload: {
+                    op: "UNHIGHLIGHT",
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
         // fallback (unknown line)
         i++;
     }

@@ -12,48 +12,25 @@ import HashMapDisplay from "./components/visualizers/HashMapDisplay";
 import HashSetDisplay from "./components/visualizers/HashSetDisplay";
 import TreeDisplay from "./components/visualizers/TreeDisplay";
 import GraphDisplay from "./components/visualizers/GraphDisplay";
+import MatrixDisplay from "./components/visualizers/MatrixDisplay";
 import "./styles/App.css";
 
 export default function App() {
-  const [code, setCode] = useState(`GRAPH_START
+  const [code, setCode] = useState(`MATRIX_CREATE grid 3 3
 
-GRAPH_NODE A 10
-GRAPH_NODE B 20
-GRAPH_NODE C 30
-GRAPH_NODE D 40
+MATRIX_SET grid 0 0 1
+MATRIX_SET grid 0 1 2
+MATRIX_SET grid 0 2 3
 
-GRAPH_CONNECT A B
-GRAPH_CONNECT B C
-GRAPH_CONNECT C D
-GRAPH_CONNECT D A
-GRAPH_CONNECT A C 5
+MATRIX_SET grid 1 0 4
+MATRIX_SET grid 1 1 5
+MATRIX_SET grid 1 2 6
 
-GRAPH_VISIT A
-GRAPH_VISIT C
+MATRIX_SET grid 2 0 7
+MATRIX_SET grid 2 1 8
+MATRIX_SET grid 2 2 9
 
-GRAPH_HIGHLIGHT_NODE B
-GRAPH_HIGHLIGHT_EDGE A C
-
-GRAPH_COLOR_NODE C green
-GRAPH_COLOR_NODE D orange
-
-GRAPH_COLOR_EDGE A B blue
-GRAPH_COLOR_EDGE C D red
-
-GRAPH_UPDATE_VAL B 99
-GRAPH_UPDATE_WEIGHT A C 12
-
-GRAPH_UNHIGHLIGHT_NODE B
-GRAPH_UNHIGHLIGHT_EDGE A C
-
-GRAPH_UNVISIT C
-
-GRAPH_RESET_NODE_COLOR D
-GRAPH_RESET_EDGE_COLOR C D
-
-GRAPH_DISCONNECT D A
-
-GRAPH_DELETE B
+MATRIX_HIGHLIGHT grid 1 1
 `);
 
   const [steps, setSteps] = useState([]);
@@ -99,7 +76,7 @@ GRAPH_DELETE B
       visit: [],
       active: []
     },
-
+    matrix: rawState.matrix || {},
     hashMap: rawState.hashMap || {},
     hashSet: rawState.hashSet || {}
   };
@@ -231,12 +208,22 @@ GRAPH_DELETE B
 
       {/* VISUALIZER */}
       <div className="visualizer">
+        <h3>Matrix</h3>
+
+{Object.entries(state.matrix).map(([name, matrix]) => (
+  <MatrixDisplay
+    key={name}
+    name={name}
+    matrix={matrix}
+    pointers={state.pointers}
+/>
+))}
+        <h3>Tree</h3>
         <h3>Graph</h3>
         {console.log(state.graph)}
 
         <GraphDisplay graph={state.graph} />
-
-        <h3>Tree</h3>
+        
 
         <TreeDisplay tree={state.tree}
           highlights={state.highlights} />

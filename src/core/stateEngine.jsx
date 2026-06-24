@@ -56,9 +56,10 @@ export function getStateAt(events = [], currentStep = 0) {
             swap: [],
             visit: [],
             active: []
-        }
+        },
+        matrix: {}
     };
-
+    console.log(events);
     for (let i = 0; i <= currentStep && i < events.length; i++) {
         const event = events[i];
         if (!event) continue;
@@ -85,6 +86,17 @@ export function getStateAt(events = [], currentStep = 0) {
 
                     case "hashSet":
                         state.hashSet[event.payload.name] = [];
+                        break;
+                    case "matrix":
+                        state.matrix[event.payload.name] = {
+                            rows: event.payload.rows,
+                            cols: event.payload.cols,
+                            values: Array.from(
+                                { length: event.payload.rows },
+                                () => Array(event.payload.cols).fill(null)
+                            ),
+                            highlights: []
+                        };
                         break;
                 }
                 break;
@@ -120,14 +132,42 @@ export function getStateAt(events = [], currentStep = 0) {
                     if (p.op === "ENQUEUE") state.queue.push(p.value);
                     if (p.op === "DEQUEUE") state.queue.shift();
                 }
+                if (event.target === "matrix") {
+                    const p = event.payload;
+
+                    if (p.op === "SET") {
+                        state.matrix[p.name].values[p.row][p.col] = p.value;
+                    }
+
+                    if (p.op === "GET") {
+                        state.matrix[p.name].highlights = [{
+                            row: p.row,
+                            col: p.col
+                        }];
+                    }
+
+                    if (p.op === "HIGHLIGHT") {
+                        state.matrix[p.name].highlights.push({
+                            row: p.row,
+                            col: p.col
+                        });
+                    }
+
+                    if (p.op === "UNHIGHLIGHT") {
+                        state.matrix[p.name].highlights = [];
+                    }
+                }
                 break;
+
 
             // =========================
             // POINTER
             // =========================
             case "POINTER":
-                state.pointers[event.payload.name] =
-                    event.payload.position;
+                state.pointers[event.payload.name] = {
+                    type: event.payload.type || "INDEX",
+                    position: event.payload.position
+                };
                 break;
 
             // =========================
@@ -458,7 +498,8 @@ export function getStateAt(events = [], currentStep = 0) {
                     edges: []
                 };
                 break;
-            
+
+
         }
     }
 
