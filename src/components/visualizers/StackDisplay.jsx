@@ -1,69 +1,74 @@
 export default function StackDisplay({
-  step = null,
-  stack = null,
+  stacks = {},
 }) {
-  const displayStack = step?.array || stack || [];
-  const pointers = step?.pointers || [];
-  const message = step?.message || "";
 
-  const topPointer =
-    pointers.find((p) => p.name === "top");
+  const stackEntries = Object.entries(stacks);
+
+  if (stackEntries.length === 0) return null;
 
   return (
     <div style={{ padding: "20px" }}>
-      {message && <h3>{message}</h3>}
+      {stackEntries.map(([stackName, stack]) => (
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column-reverse",
-          gap: "8px",
-          marginTop: "20px",
-          alignItems: "center",
-        }}
-      >
-        {displayStack.map((value, idx) => {
-          const isTop =
-            topPointer
-              ? topPointer.index === idx
-              : idx === displayStack.length - 1;
+        <div
+          key={stackName}
+          style={{ marginBottom: "30px" }}
+        >
+          <h4>{stackName}</h4>
 
-          return (
-            <div
-              key={idx}
-              style={{ textAlign: "center" }}
-            >
-              {isTop && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column-reverse",
+              gap: "8px",
+              marginTop: "10px",
+              alignItems: "center",
+            }}
+          >
+            {stack.map((value, idx) => {
+
+              const isTop =
+                idx === stack.length - 1;
+
+              return (
                 <div
-                  style={{
-                    fontSize: "12px",
-                    marginBottom: "4px",
-                  }}
+                  key={idx}
+                  style={{ textAlign: "center" }}
                 >
-                  TOP
-                </div>
-              )}
+                  {isTop && (
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      TOP
+                    </div>
+                  )}
 
-              <div
-                style={{
-                  width: "60px",
-                  height: "40px",
-                  backgroundColor: isTop
-                    ? "#ff7043"
-                    : "#90caf9",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "6px",
-                  fontWeight: "bold",
-                }}
-              >
-                {value}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                  <div
+                    style={{
+                      width: "60px",
+                      height: "40px",
+                      backgroundColor: isTop
+                        ? "#ff7043"
+                        : "#90caf9",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {value}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+      ))}
     </div>
   );
 }

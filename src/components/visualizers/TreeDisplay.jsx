@@ -3,9 +3,8 @@ import { layoutTree } from "../layout/treeLayout";
 export default function TreeDisplay({ tree, highlights }) {
 
     const positions = layoutTree(tree);
-    const activeNodes = new Set(highlights.active);
-
-    const visitedNodes = new Set(highlights.visit);
+    const activeNodes = new Set(highlights.treeActive || []);
+const visitedNodes = new Set(highlights.treeVisit || []);
 
 
     return (

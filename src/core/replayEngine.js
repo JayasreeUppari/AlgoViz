@@ -1,38 +1,48 @@
-import StackDisplay from "../components/visualizers/StackDisplay";
-
 export function replayExecution(code) {
-    const lines = code
-        .split("\n")
-        .map(l => l.trim())
-        .filter(Boolean);
+    const rawLines = code.split("\n");
 
     const events = [];
     const variablesContext = {}
     let i = 0;
 
-    const line = lines[i];
 
 
-    while (i < lines.length) {
-        const line = lines[i];
+    while (i < rawLines.length) {
+
+        const line = rawLines[i].trim();
+
+        if (!line) {
+            i++;
+            continue;
+        }
+
+
 
         // ======================
         // ARRAY
         // ======================
-        if (line.startsWith("ARRAY")) {
-            const values = line
-                .replace("ARRAY", "")
-                .trim()
-                .replace("[", "")
-                .replace("]", "")
+        if (line.startsWith("ARRAY ")) {
+            const match = line.match(/^ARRAY\s+(\w+)\s+\[(.*)\]$/);
+
+            if (!match) {
+                i++;
+                continue;
+            }
+
+            const name = match[1];
+
+            const values = match[2]
                 .split(",")
-                .filter(v => v !== "")
-                .map(Number);
+                .map(v => Number(v.trim()));
 
             events.push({
                 type: "CREATE",
+                sourceLine: i,
                 target: "array",
-                payload: { value: values }
+                payload: {
+                    name,
+                    values
+                }
             });
 
             i++;
@@ -40,16 +50,18 @@ export function replayExecution(code) {
         }
 
         // ======================
-        // UPDATE ARRAY
+        // ARRAY SET
         // ======================
-        if (line.startsWith("UPDATE")) {
-            const [, index, value] = line.split(" ");
+        if (line.startsWith("ARRAY_SET")) {
+            const [, name, index, value] = line.split(" ");
 
             events.push({
                 type: "MUTATE",
+                sourceLine: i,
                 target: "array",
                 payload: {
-                    op: "UPDATE",
+                    op: "SET",
+                    name,
                     index: Number(index),
                     value: Number(value)
                 }
@@ -60,100 +72,20 @@ export function replayExecution(code) {
         }
 
         // ======================
-        // STACK
+        // ARRAY SWAP
         // ======================
-        if (line === "STACK") {
-            events.push({
-                type: "CREATE",
-                target: "stack",
-                payload: {}
-            });
-
-            i++;
-            continue;
-        }
-
-        if (line.startsWith("PUSH")) {
-            const [, value] = line.split(" ");
+        if (line.startsWith("ARRAY_SWAP")) {
+            const [, name, left, right] = line.split(" ");
 
             events.push({
                 type: "MUTATE",
-                target: "stack",
-                payload: {
-                    op: "PUSH",
-                    value: Number(value)
-                }
-            });
-
-            i++;
-            continue;
-        }
-
-        if (line === "POP") {
-            events.push({
-                type: "MUTATE",
-                target: "stack",
-                payload: { op: "POP" }
-            });
-
-            i++;
-            continue;
-        }
-
-        // ======================
-        // QUEUE
-        // ======================
-        if (line === "QUEUE") {
-            events.push({
-                type: "CREATE",
-                target: "queue",
-                payload: {}
-            });
-
-            i++;
-            continue;
-        }
-
-        if (line.startsWith("ENQUEUE")) {
-            const [, value] = line.split(" ");
-
-            events.push({
-                type: "MUTATE",
-                target: "queue",
-                payload: {
-                    op: "ENQUEUE",
-                    value: Number(value)
-                }
-            });
-
-            i++;
-            continue;
-        }
-
-        if (line === "DEQUEUE") {
-            events.push({
-                type: "MUTATE",
-                target: "queue",
-                payload: { op: "DEQUEUE" }
-            });
-
-            i++;
-            continue;
-        }
-
-        // ======================
-        // SWAP
-        // ======================
-        if (line.startsWith("SWAP")) {
-            const [, a, b] = line.split(" ");
-
-            events.push({
-                type: "MUTATE",
+                sourceLine: i,
                 target: "array",
                 payload: {
                     op: "SWAP",
-                    i: Number(a),
-                    j: Number(b)
+                    name,
+                    i: Number(left),
+                    j: Number(right)
                 }
             });
 
@@ -165,13 +97,15 @@ export function replayExecution(code) {
         // POINTERS
         // ======================
         if (line.startsWith("POINTER") || line.startsWith("MOVE")) {
-            const [, name, index] = line.split(" ");
+            const [, pointerName, arrayName, index] = line.split(" ");
 
             events.push({
                 type: "POINTER",
+                sourceLine: i,
                 target: "array",
                 payload: {
-                    name,
+                    name: pointerName,
+                    array: arrayName,
                     position: Number(index)
                 }
             });
@@ -184,12 +118,14 @@ export function replayExecution(code) {
         // COMPARE
         // ======================
         if (line.startsWith("COMPARE")) {
-            const [, a, b] = line.split(" ");
+            const [, name, a, b] = line.split(" ");
 
             events.push({
                 type: "COMPARE",
+                sourceLine: i,
                 target: "array",
                 payload: {
+                    name,
                     a: Number(a),
                     b: Number(b)
                 }
@@ -198,6 +134,114 @@ export function replayExecution(code) {
             i++;
             continue;
         }
+        // ======================
+        // STACK
+        // ======================
+        if (line.startsWith("STACK ")) {
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "CREATE",
+                sourceLine: i,
+                target: "stack",
+                payload: {
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("STACK_PUSH")) {
+            const [, name, value] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                sourceLine: i,
+                target: "stack",
+                payload: {
+                    op: "PUSH",
+                    name,
+                    value: Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("STACK_POP")) {
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                sourceLine: i,
+                target: "stack",
+                payload: {
+                    op: "POP",
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        // ======================
+        // QUEUE
+        // ======================
+        if (line.startsWith("QUEUE ")) {
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "CREATE",
+                sourceLine: i,
+                target: "queue",
+                payload: {
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("QUEUE_ENQUEUE")) {
+            const [, name, value] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                sourceLine: i,
+                target: "queue",
+                payload: {
+                    op: "ENQUEUE",
+                    name,
+                    value: Number(value)
+                }
+            });
+
+            i++;
+            continue;
+        }
+
+        if (line.startsWith("QUEUE_DEQUEUE")) {
+            const [, name] = line.split(" ");
+
+            events.push({
+                type: "MUTATE",
+                sourceLine: i,
+                target: "queue",
+                payload: {
+                    op: "DEQUEUE",
+                    name
+                }
+            });
+
+            i++;
+            continue;
+        }
+
 
         // ======================
         // LINKED LIST
@@ -207,6 +251,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "LIST_CREATE",
+                sourceLine: i,
                 payload: { id, value: Number(value) }
             });
 
@@ -219,6 +264,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "LIST_LINK",
+                sourceLine: i,
                 payload: { from, to }
             });
 
@@ -231,6 +277,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "LIST_HEAD",
+                sourceLine: i,
                 payload: { id }
             });
 
@@ -243,6 +290,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "LIST_POINTER",
+                sourceLine: i,
                 payload: {
                     name,
                     position: nodeId
@@ -264,6 +312,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "DECLARE_VAR",
+                sourceLine: i,
                 payload: {
                     name,
                     value: Number(value)
@@ -281,6 +330,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "SET_VAR",
+                sourceLine: i,
                 payload: {
                     name,
                     value: Number(value)
@@ -297,7 +347,8 @@ export function replayExecution(code) {
         if (line === "ENTER_IF") {
 
             events.push({
-                type: "ENTER_IF"
+                type: "ENTER_IF",
+                sourceLine: i
             });
 
             i++;
@@ -307,7 +358,8 @@ export function replayExecution(code) {
         if (line === "EXIT_IF") {
 
             events.push({
-                type: "EXIT_IF"
+                type: "EXIT_IF",
+                sourceLine: i,
             });
 
             i++;
@@ -317,7 +369,8 @@ export function replayExecution(code) {
         if (line === "ENTER_ELSE") {
 
             events.push({
-                type: "ENTER_ELSE"
+                type: "ENTER_ELSE",
+                sourceLine: i,
             });
 
             i++;
@@ -327,7 +380,8 @@ export function replayExecution(code) {
         if (line === "EXIT_ELSE") {
 
             events.push({
-                type: "EXIT_ELSE"
+                type: "EXIT_ELSE",
+                sourceLine: i,
             });
 
             i++;
@@ -353,6 +407,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "CALL",
+                sourceLine: i,
                 payload: {
                     functionName,
                     params
@@ -365,7 +420,8 @@ export function replayExecution(code) {
         if (line === "RETURN") {
 
             events.push({
-                type: "RETURN"
+                type: "RETURN",
+                sourceLine: i,
             });
 
             i++;
@@ -379,6 +435,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "CREATE",
+                sourceLine: i,
                 target: "hashMap",
                 payload: {
                     name
@@ -393,6 +450,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MAP_PUT",
+                sourceLine: i,
                 target: "hashMap",
                 payload: {
                     map: mapName,
@@ -409,6 +467,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MAP_REMOVE",
+                sourceLine: i,
                 target: "hashMap",
                 payload: {
                     map: mapName,
@@ -427,6 +486,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "CREATE",
+                sourceLine: i,
                 target: "hashSet",
                 payload: {
                     name
@@ -441,6 +501,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "SET_ADD",
+                sourceLine: i,
                 target: "hashSet",
                 payload: {
                     set: setName,
@@ -456,6 +517,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "SET_REMOVE",
+                sourceLine: i,
                 target: "hashSet",
                 payload: {
                     set: setName,
@@ -475,6 +537,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_NODE",
+                sourceLine: i,
                 payload: {
                     id,
                     value: Number(value)
@@ -489,6 +552,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_ROOT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -502,6 +566,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_CONNECT",
+                sourceLine: i,
                 payload: {
                     parent,
                     child,
@@ -517,6 +582,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_DISCONNECT",
+                sourceLine: i,
                 payload: {
                     parent,
                     side
@@ -531,6 +597,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_DELETE",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -544,6 +611,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_UPDATE_VAL",
+                sourceLine: i,
                 payload: {
                     id,
                     value: Number(value)
@@ -558,6 +626,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_VISIT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -571,6 +640,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_HIGHLIGHT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -584,6 +654,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "TREE_UNHIGHLIGHT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -600,6 +671,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_START",
+                sourceLine: i,
                 payload: {}
             });
 
@@ -613,6 +685,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_NODE",
+                sourceLine: i,
                 payload: {
                     id,
                     value
@@ -639,6 +712,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_CONNECT",
+                sourceLine: i,
                 payload: {
                     from,
                     to,
@@ -657,6 +731,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_DISCONNECT",
+                sourceLine: i,
                 payload: {
                     from,
                     to
@@ -673,6 +748,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_DELETE",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -688,6 +764,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_VISIT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -703,6 +780,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_UNVISIT",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -718,6 +796,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_HIGHLIGHT_NODE",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -733,6 +812,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_UNHIGHLIGHT_NODE",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -748,6 +828,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_HIGHLIGHT_EDGE",
+                sourceLine: i,
                 payload: {
                     from,
                     to
@@ -764,6 +845,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_UNHIGHLIGHT_EDGE",
+                sourceLine: i,
                 payload: {
                     from,
                     to
@@ -780,6 +862,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_UPDATE_VAL",
+                sourceLine: i,
                 payload: {
                     id,
                     value
@@ -796,6 +879,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_UPDATE_WEIGHT",
+                sourceLine: i,
                 payload: {
                     from,
                     to,
@@ -813,6 +897,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_COLOR_NODE",
+                sourceLine: i,
                 payload: {
                     id,
                     color
@@ -829,6 +914,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_COLOR_EDGE",
+                sourceLine: i,
                 payload: {
                     from,
                     to,
@@ -846,6 +932,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_RESET_NODE_COLOR",
+                sourceLine: i,
                 payload: {
                     id
                 }
@@ -861,6 +948,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_RESET_EDGE_COLOR",
+                sourceLine: i,
                 payload: {
                     from,
                     to
@@ -875,6 +963,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "GRAPH_CLEAR",
+                sourceLine: i,
                 payload: {}
             });
 
@@ -889,6 +978,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "CREATE",
+                sourceLine: i,
                 target: "matrix",
                 payload: {
                     name,
@@ -908,6 +998,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MUTATE",
+                sourceLine: i,
                 target: "matrix",
                 payload: {
                     op: "SET",
@@ -929,6 +1020,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MUTATE",
+                sourceLine: i,
                 target: "matrix",
                 payload: {
                     op: "GET",
@@ -949,6 +1041,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MUTATE",
+                sourceLine: i,
                 target: "matrix",
                 payload: {
                     op: "HIGHLIGHT",
@@ -970,6 +1063,7 @@ export function replayExecution(code) {
 
             events.push({
                 type: "MUTATE",
+                sourceLine: i,
                 target: "matrix",
                 payload: {
                     op: "UNHIGHLIGHT",

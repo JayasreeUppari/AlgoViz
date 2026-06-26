@@ -13,24 +13,15 @@ import HashSetDisplay from "./components/visualizers/HashSetDisplay";
 import TreeDisplay from "./components/visualizers/TreeDisplay";
 import GraphDisplay from "./components/visualizers/GraphDisplay";
 import MatrixDisplay from "./components/visualizers/MatrixDisplay";
+import ErrorPanel from "./components/ErrorPanel";
 import "./styles/App.css";
 
 export default function App() {
-  const [code, setCode] = useState(`MATRIX_CREATE grid 3 3
+  const [code, setCode] = useState(`DECLARE x 10
+DECLARE y 20
 
-MATRIX_SET grid 0 0 1
-MATRIX_SET grid 0 1 2
-MATRIX_SET grid 0 2 3
-
-MATRIX_SET grid 1 0 4
-MATRIX_SET grid 1 1 5
-MATRIX_SET grid 1 2 6
-
-MATRIX_SET grid 2 0 7
-MATRIX_SET grid 2 1 8
-MATRIX_SET grid 2 2 9
-
-MATRIX_HIGHLIGHT grid 1 1
+SET x 50
+SET y 100
 `);
 
   const [steps, setSteps] = useState([]);
@@ -49,11 +40,12 @@ MATRIX_HIGHLIGHT grid 1 1
 
   const state = {
     variables: rawState.variables || {},
+    errors: rawState.errors || [],
     callStack: rawState.callStack || [],
 
-    array: rawState.array || [],
-    stack: rawState.stack || [],
-    queue: rawState.queue || [],
+    arrays: rawState.arrays || {},
+    stacks: rawState.stacks || {},
+    queues: rawState.queues || {},
 
     list: rawState.list || {
       nodes: {},
@@ -208,53 +200,58 @@ MATRIX_HIGHLIGHT grid 1 1
 
       {/* VISUALIZER */}
       <div className="visualizer">
-        <h3>Matrix</h3>
+            <ErrorPanel errors={state.errors} />
+        <VariablesDisplay
+          variables={state.variables}
+        />
 
-{Object.entries(state.matrix).map(([name, matrix]) => (
-  <MatrixDisplay
-    key={name}
-    name={name}
-    matrix={matrix}
-    pointers={state.pointers}
-/>
-))}
-        <h3>Tree</h3>
-        <h3>Graph</h3>
-        {console.log(state.graph)}
+        <CallStackDisplay
+          stack={state.callStack}
+        />
 
-        <GraphDisplay graph={state.graph} />
-        
-
-        <TreeDisplay tree={state.tree}
-          highlights={state.highlights} />
-
-        <h3>HashMap</h3>
-        <HashMapDisplay maps={state.hashMap} />
-        <h3>HashSet</h3>
-
-        <HashSetDisplay sets={state.hashSet} />
-        <h3>Variables</h3>
-        <VariablesDisplay variables={state.variables} />
-
-        <h3>Call Stack</h3>
-        <CallStackDisplay stack={state.callStack} />
-        <h3>Array</h3>
         <ArrayDisplay
-          array={state.array}
+          arrays={state.arrays}
           pointers={state.pointers}
           highlights={state.highlights}
         />
 
-        <h3>Stack</h3>
-        <StackDisplay stack={state.stack} />
+        <StackDisplay
+          stacks={state.stacks}
+        />
 
-        <h3>Queue</h3>
-        <QueueDisplay queue={state.queue} />
+        <QueueDisplay
+          queues={state.queues}
+        />
 
-        <h3>Linked List</h3>
+        {Object.entries(state.matrix).map(([name, matrix]) => (
+          <MatrixDisplay
+            key={name}
+            name={name}
+            matrix={matrix}
+            pointers={state.pointers}
+          />
+        ))}
+
+        <HashMapDisplay
+          maps={state.hashMap}
+        />
+
+        <HashSetDisplay
+          sets={state.hashSet}
+        />
+
         <LinkedListDisplay
           list={state.list}
           pointers={state.pointers}
+        />
+
+        <TreeDisplay
+          tree={state.tree}
+          highlights={state.highlights}
+        />
+
+        <GraphDisplay
+          graph={state.graph}
         />
 
       </div>
