@@ -1,83 +1,72 @@
 .call-stack {
-    width: 290px;
-    background: #fff;
-    border: 1px solid #dbe4ef;
-    border-radius: 14px;
-    padding: 14px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 8px 18px rgba(0,0,0,.08);
-}
-
-.current-execution {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-}
-
-.exec-label {
-    font-size: 12px;
-    opacity: .85;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.exec-name {
-    font-size: 18px;
-    font-weight: 700;
-    font-family: Consolas, monospace;
+    gap: 10px;
+    box-shadow: none;
 }
 
 .call-stack h3 {
-    margin: 0;
-    color: #374151;
-    font-size: 18px;
+    margin: 0 0 4px 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
 
 .frame {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    border-left: 5px solid #94a3b8;
-    border-radius: 10px;
-    padding: 10px;
-    transition: .25s;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    transition: 0.2s ease;
 }
 
 .active-frame {
-    border-left-color: #22c55e;
-    background: #ecfdf5;
-    box-shadow: 0 0 0 2px rgba(34,197,94,.15);
+    border-left-color: var(--success);
+    background: rgba(63, 185, 80, 0.08);
+    box-shadow: 0 0 0 1px rgba(63, 185, 80, 0.2);
 }
 
 .frame-title {
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .active-frame .frame-title::after {
     content: "ACTIVE";
-    font-size: 11px;
-    background: #22c55e;
-    color: white;
+    font-size: 10px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    background: var(--success);
+    color: #04200a;
     padding: 2px 7px;
     border-radius: 20px;
+    letter-spacing: 0.3px;
 }
 
 .param {
     display: flex;
     justify-content: space-between;
     padding: 3px 0;
-    font-size: 14px;
-    color: #4b5563;
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
 }
 
 .param span:last-child {
     font-weight: 600;
-    color: #111827;
+    color: var(--text-primary);
 }

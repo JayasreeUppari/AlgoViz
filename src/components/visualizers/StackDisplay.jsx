@@ -7,14 +7,25 @@ export default function StackDisplay({
   if (stackEntries.length === 0) return null;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: 0 }}>
       {stackEntries.map(([stackName, stack]) => (
 
         <div
           key={stackName}
-          style={{ marginBottom: "30px" }}
+          style={{ marginBottom: "22px" }}
         >
-          <h4>{stackName}</h4>
+          <h4
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "12px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {stackName}
+          </h4>
 
           <div
             style={{
@@ -38,8 +49,11 @@ export default function StackDisplay({
                   {isTop && (
                     <div
                       style={{
-                        fontSize: "12px",
+                        fontSize: "10px",
                         marginBottom: "4px",
+                        fontWeight: "700",
+                        letterSpacing: "0.5px",
+                        color: "var(--accent)",
                       }}
                     >
                       TOP
@@ -51,13 +65,18 @@ export default function StackDisplay({
                       width: "60px",
                       height: "40px",
                       backgroundColor: isTop
-                        ? "#ff7043"
-                        : "#90caf9",
+                        ? "var(--accent)"
+                        : "var(--bg-elevated)",
+                      color: isTop ? "#fff" : "var(--text-primary)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "6px",
-                      fontWeight: "bold",
+                      fontWeight: "700",
+                      fontFamily: "var(--font-mono)",
+                      border: isTop
+                        ? "1px solid #93c5fd"
+                        : "1px solid var(--border-subtle)",
                     }}
                   >
                     {value}

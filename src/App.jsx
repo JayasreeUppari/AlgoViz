@@ -29,7 +29,6 @@ SET y 100
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
 
-
   const intervalRef = useRef(null);
 
   // =========================
@@ -73,7 +72,32 @@ SET y 100
     hashSet: rawState.hashSet || {}
   };
 
+  // currentLine is tracked directly by stateEngine (state.currentLine),
+  // reflecting the DSL source line of the most recently applied event.
+  const currentLine = rawState.currentLine ?? null;
+
   const currentEvent = steps[current];
+
+  // =========================
+  // "IN USE" CHECKS
+  // Each structure only gains a key/value once a CREATE-type event
+  // for it has fired (see stateEngine.jsx), so emptiness here reliably
+  // means "doesn't exist yet in this run" rather than "exists but empty".
+  // =========================
+  const hasVariables = Object.keys(state.variables).length > 0;
+  const hasCallStack = state.callStack.length > 0;
+  const hasErrors = state.errors.length > 0;
+
+  const hasArrays = Object.keys(state.arrays).length > 0;
+  const hasStacks = Object.keys(state.stacks).length > 0;
+  const hasQueues = Object.keys(state.queues).length > 0;
+  const hasMatrix = Object.keys(state.matrix).length > 0;
+  const hasHashMap = Object.keys(state.hashMap).length > 0;
+  const hasHashSet = Object.keys(state.hashSet).length > 0;
+
+  const hasList = !!state.list.head || Object.keys(state.list.nodes || {}).length > 0;
+  const hasTree = !!state.tree.root || Object.keys(state.tree.nodes || {}).length > 0;
+  const hasGraph = Object.keys(state.graph.nodes || {}).length > 0;
 
   // =========================
   // GENERATE DSL → EVENTS
@@ -124,25 +148,67 @@ SET y 100
     setCurrent((prev) =>
       Math.max(prev - 1, 0)
     );
+
+  // =========================
+  // LINE NUMBER GUTTER (for the DSL Input editor)
+  // Keeps the gutter scroll position synced with the textarea.
+  // =========================
+  const gutterRef = useRef(null);
+  const textareaRef = useRef(null);
+  const codeLines = code.split("\n");
+
+  const handleEditorScroll = () => {
+    if (gutterRef.current && textareaRef.current) {
+      gutterRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
   // =========================
   // UI
   // =========================
 
-
   return (
     <div className="app">
-
       <h1 className="title">AlgoViz</h1>
 
-      {/* INPUT */}
+      {/* LEFT COLUMN: input + future-DSL panels, RIGHT: visualizer happens below */}
       <div className="editor-section">
+        {/* INPUT (with line-number gutter) */}
         <div className="panel">
           <h3>DSL Input</h3>
-          <textarea
-            className="editor"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
+          <div className="editor-wrap">
+            <div className="line-gutter" ref={gutterRef}>
+              {codeLines.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={
+                    "line-number" +
+                    (currentLine === idx ? " line-number--active" : "")
+                  }
+                >
+                  {idx + 1}
+                </div>
+              ))}
+            </div>
+            <textarea
+              ref={textareaRef}
+              className="editor"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              onScroll={handleEditorScroll}
+              spellCheck={false}
+            />
+          </div>
+        </div>
+
+        {/* DSL (placeholder — will show compiled DSL from Java input in the future) */}
+        <div className="panel">
+          <h3>DSL</h3>
+          <div className="dsl-box dsl-box--empty">
+            <span className="dsl-placeholder">
+              DSL output will appear here once Java → DSL compilation is wired up.
+            </span>
+          </div>
         </div>
       </div>
 
@@ -183,8 +249,6 @@ SET y 100
       </div>
 
       {/* STATUS */}
-
-
       <div className="status">
         <p>
           Step {steps.length ? current + 1 : 0} / {steps.length}
@@ -197,63 +261,70 @@ SET y 100
         </p>
       </div>
 
-
-      {/* VISUALIZER */}
+      {/* VISUALIZER — only structures currently in use are rendered */}
       <div className="visualizer">
-            <ErrorPanel errors={state.errors} />
-        <VariablesDisplay
-          variables={state.variables}
-        />
+        {hasErrors && <ErrorPanel errors={state.errors} />}
 
-        <CallStackDisplay
-          stack={state.callStack}
-        />
+        {hasVariables && (
+          <VariablesDisplay variables={state.variables} />
+        )}
 
-        <ArrayDisplay
-          arrays={state.arrays}
-          pointers={state.pointers}
-          highlights={state.highlights}
-        />
+        {hasCallStack && (
+          <CallStackDisplay stack={state.callStack} />
+        )}
 
-        <StackDisplay
-          stacks={state.stacks}
-        />
-
-        <QueueDisplay
-          queues={state.queues}
-        />
-
-        {Object.entries(state.matrix).map(([name, matrix]) => (
-          <MatrixDisplay
-            key={name}
-            name={name}
-            matrix={matrix}
+        {hasArrays && (
+          <ArrayDisplay
+            arrays={state.arrays}
             pointers={state.pointers}
+            highlights={state.highlights}
           />
-        ))}
+        )}
 
-        <HashMapDisplay
-          maps={state.hashMap}
-        />
+        {hasStacks && <StackDisplay stacks={state.stacks} />}
 
-        <HashSetDisplay
-          sets={state.hashSet}
-        />
+        {hasQueues && <QueueDisplay queues={state.queues} />}
 
-        <LinkedListDisplay
-          list={state.list}
-          pointers={state.pointers}
-        />
+        {hasMatrix &&
+          Object.entries(state.matrix).map(([name, matrix]) => (
+            <MatrixDisplay
+              key={name}
+              name={name}
+              matrix={matrix}
+              pointers={state.pointers}
+            />
+          ))}
 
-        <TreeDisplay
-          tree={state.tree}
-          highlights={state.highlights}
-        />
+        {hasHashMap && <HashMapDisplay maps={state.hashMap} />}
 
-        <GraphDisplay
-          graph={state.graph}
-        />
+        {hasHashSet && <HashSetDisplay sets={state.hashSet} />}
 
+        {hasList && (
+          <LinkedListDisplay list={state.list} pointers={state.pointers} />
+        )}
+
+        {hasTree && (
+          <TreeDisplay tree={state.tree} highlights={state.highlights} />
+        )}
+
+        {hasGraph && <GraphDisplay graph={state.graph} />}
+
+        {!hasErrors &&
+          !hasVariables &&
+          !hasCallStack &&
+          !hasArrays &&
+          !hasStacks &&
+          !hasQueues &&
+          !hasMatrix &&
+          !hasHashMap &&
+          !hasHashSet &&
+          !hasList &&
+          !hasTree &&
+          !hasGraph && (
+            <p className="visualizer-empty">
+              Nothing to show yet — click Visualize to run the DSL.
+            </p>
+          )}
       </div>
     </div>
   );

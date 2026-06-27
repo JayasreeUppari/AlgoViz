@@ -1,5 +1,14 @@
 .hashset-container {
-    margin: 20px 0;
+    margin: 0;
+}
+
+.hashset-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-secondary);
 }
 
 .hashset-values {
@@ -9,9 +18,14 @@
 }
 
 .hashset-item {
-    border: 2px solid #555;
-    border-radius: 8px;
-    padding: 10px 15px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-panel-alt);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
     min-width: 40px;
     text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    transition: 0.2s ease;
 }

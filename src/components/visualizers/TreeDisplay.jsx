@@ -6,12 +6,20 @@ export default function TreeDisplay({ tree, highlights }) {
     const activeNodes = new Set(highlights.treeActive || []);
 const visitedNodes = new Set(highlights.treeVisit || []);
 
-
+    
     return (
+        
         <svg
+        
             width="900"
             height="600"
+            style={{
+                background: "var(--bg-base)",
+                borderRadius: "var(--radius-md)",
+                maxWidth: "100%",
+            }}
         >
+            
             {/* //edge map */}
             {
                 Object.entries(tree.nodes).map(([id, node]) => {
@@ -30,7 +38,8 @@ const visitedNodes = new Set(highlights.treeVisit || []);
                                     y1={parent.y}
                                     x2={positions[node.left].x}
                                     y2={positions[node.left].y}
-                                    stroke="black"
+                                    stroke="#4b5563"
+                                    strokeWidth="1.5"
                                 />
 
                             )}
@@ -43,7 +52,8 @@ const visitedNodes = new Set(highlights.treeVisit || []);
                                     y1={parent.y}
                                     x2={positions[node.right].x}
                                     y2={positions[node.right].y}
-                                    stroke="black"
+                                    stroke="#4b5563"
+                                    strokeWidth="1.5"
                                 />
 
                             )}
@@ -74,15 +84,14 @@ const visitedNodes = new Set(highlights.treeVisit || []);
 
                             r={25}
 
-                            fill="white"
-
-                            stroke="black"
+                            stroke="#e6edf3"
+                            strokeWidth="1.5"
                             fill={
                                 active
-                                    ? "#ffd54f"
+                                    ? "#d29922"
                                     : visited
-                                        ? "#90caf9"
-                                        : "white"
+                                        ? "#3b82f6"
+                                        : "#21262d"
                             }
 
                         />
@@ -109,6 +118,12 @@ const visitedNodes = new Set(highlights.treeVisit || []);
                             y={p.y + 5}
 
                             textAnchor="middle"
+                            fontWeight="bold"
+                            fill={
+                                (node && (activeNodes.has(id) || visitedNodes.has(id)))
+                                    ? "#0d1117"
+                                    : "#e6edf3"
+                            }
 
                         >
 

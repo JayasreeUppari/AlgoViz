@@ -7,15 +7,26 @@ export default function QueueDisplay({
   if (queueEntries.length === 0) return null;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: 0 }}>
 
       {queueEntries.map(([queueName, queue]) => (
 
         <div
           key={queueName}
-          style={{ marginBottom: "30px" }}
+          style={{ marginBottom: "22px" }}
         >
-          <h4>{queueName}</h4>
+          <h4
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "12px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {queueName}
+          </h4>
 
           <div
             style={{
@@ -31,7 +42,12 @@ export default function QueueDisplay({
                 {idx === 0 && (
                   <div
                     style={{
-                      fontSize: "12px",
+                      fontSize: "10px",
+                      fontWeight: "700",
+                      letterSpacing: "0.5px",
+                      color: "var(--success)",
+                      textAlign: "center",
+                      marginBottom: "4px",
                     }}
                   >
                     FRONT
@@ -42,12 +58,15 @@ export default function QueueDisplay({
                   style={{
                     width: "60px",
                     height: "40px",
-                    backgroundColor: "#81c784",
+                    backgroundColor: "var(--bg-elevated)",
+                    color: "var(--text-primary)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "6px",
-                    fontWeight: "bold",
+                    fontWeight: "700",
+                    fontFamily: "var(--font-mono)",
+                    border: "1px solid var(--border-subtle)",
                   }}
                 >
                   {value}
@@ -56,7 +75,12 @@ export default function QueueDisplay({
                 {idx === queue.length - 1 && (
                   <div
                     style={{
-                      fontSize: "12px",
+                      fontSize: "10px",
+                      fontWeight: "700",
+                      letterSpacing: "0.5px",
+                      color: "var(--warning)",
+                      textAlign: "center",
+                      marginTop: "4px",
                     }}
                   >
                     REAR

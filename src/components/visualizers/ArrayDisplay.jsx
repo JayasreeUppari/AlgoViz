@@ -10,18 +10,42 @@ export default function ArrayDisplay({
   if (arrayEntries.length === 0) return null;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: 0 }}>
 
-      {message && <h3>{message}</h3>}
+      {message && (
+        <h3
+          style={{
+            margin: "0 0 12px 0",
+            fontSize: "12px",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.6px",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {message}
+        </h3>
+      )}
 
       {arrayEntries.map(([arrayName, arr]) => (
 
         <div
           key={arrayName}
-          style={{ marginBottom: "30px" }}
+          style={{ marginBottom: "22px" }}
         >
 
-          <h4>{arrayName}</h4>
+          <h4
+            style={{
+              margin: "0 0 10px 0",
+              fontSize: "12px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {arrayName}
+          </h4>
 
           <div
             style={{
@@ -58,22 +82,29 @@ export default function ArrayDisplay({
 
               // Priority: swap > set/active > compare > visit > default
               // (highest-impact mutation wins if multiple highlights overlap on the same index)
-              let bg = "#e0e0e0";
-              let border = "1px solid #ccc";
+              let bg = "var(--bg-elevated)";
+              let border = "1px solid var(--border-subtle)";
+              let textColor = "var(--text-primary)";
 
               if (isVisit) {
-                bg = "#b39ddb"; // purple
+                bg = "#7c5cbf"; // purple
+                border = "1px solid #9b7fd4";
+                textColor = "#fff";
               }
               if (isCompare) {
-                bg = "#ffd54f"; // amber
+                bg = "#c9941f"; // amber
+                border = "1px solid #e0ad3d";
+                textColor = "#fff";
               }
               if (isActive) {
-                bg = "#4fc3f7"; // blue - SET/ARRAY_SET
-                border = "2px solid #0288d1";
+                bg = "var(--accent)"; // blue - SET/ARRAY_SET
+                border = "2px solid #93c5fd";
+                textColor = "#fff";
               }
               if (isSwap) {
-                bg = "#ef5350"; // red - SWAP
-                border = "2px solid #b71c1c";
+                bg = "var(--danger)"; // red - SWAP
+                border = "2px solid #ff8b85";
+                textColor = "#fff";
               }
 
               return (
@@ -85,9 +116,11 @@ export default function ArrayDisplay({
                   {pointerNames.length > 0 && (
                     <div
                       style={{
-                        fontSize: "12px",
+                        fontSize: "11px",
                         marginBottom: "5px",
-                        fontWeight: "bold",
+                        fontWeight: "700",
+                        fontFamily: "var(--font-mono)",
+                        color: "var(--accent)",
                       }}
                     >
                       {pointerNames.join(",")}
@@ -99,11 +132,14 @@ export default function ArrayDisplay({
                       width: "40px",
                       height: "40px",
                       backgroundColor: bg,
+                      color: textColor,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: "6px",
-                      fontWeight: "bold",
+                      fontWeight: "700",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "14px",
                       border: border,
                       transition: "background-color 0.2s ease, border 0.2s ease",
                     }}
@@ -113,8 +149,10 @@ export default function ArrayDisplay({
 
                   <div
                     style={{
-                      fontSize: "12px",
-                      marginTop: "4px",
+                      fontSize: "11px",
+                      marginTop: "5px",
+                      color: "var(--text-muted)",
+                      fontFamily: "var(--font-mono)",
                     }}
                   >
                     {idx}

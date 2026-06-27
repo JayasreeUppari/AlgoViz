@@ -7,7 +7,7 @@ export default function LinkedListDisplay({
 }) {
 
     if (!list || !list.nodes) {
-        return <div>No Linked List</div>;
+        return null;
     }
 
     const {
@@ -21,6 +21,11 @@ export default function LinkedListDisplay({
         <svg
             width="1400"
             height={components.length * 180 + 100}
+            style={{
+                background: "var(--bg-base)",
+                borderRadius: "var(--radius-md)",
+                maxWidth: "100%",
+            }}
         >
 
             {/* COMPONENT TITLES */}
@@ -33,6 +38,7 @@ export default function LinkedListDisplay({
                         y={positions[component[0]].y - 50}
                         fontSize="18"
                         fontWeight="bold"
+                        fill="#e6edf3"
                     >
                         {`Linked List ${idx + 1}`}
                     </text>
@@ -59,8 +65,8 @@ export default function LinkedListDisplay({
                                 y1={from.y}
                                 x2={to.x}
                                 y2={to.y}
-                                stroke="black"
-                                strokeWidth="2"
+                                stroke="#6e7681"
+                                strokeWidth="1.5"
                             />
 
                             <polygon
@@ -69,7 +75,7 @@ export default function LinkedListDisplay({
                                     ${to.x},${to.y}
                                     ${to.x - 10},${to.y + 5}
                                 `}
-                                fill="black"
+                                fill="#6e7681"
                             />
 
                         </g>
@@ -93,7 +99,7 @@ export default function LinkedListDisplay({
                                 x={pos.x + 40}
                                 y={pos.y - 35}
                                 textAnchor="middle"
-                                fill="#1565c0"
+                                fill="#60a5fa"
                                 fontWeight="bold"
                             >
                                 {pointerName}
@@ -103,7 +109,7 @@ export default function LinkedListDisplay({
                                 x={pos.x + 40}
                                 y={pos.y - 15}
                                 textAnchor="middle"
-                                fill="#1565c0"
+                                fill="#60a5fa"
                             >
                                 ↓
                             </text>
@@ -130,8 +136,9 @@ export default function LinkedListDisplay({
                                 y={pos.y - 25}
                                 width="60"
                                 height="50"
-                                fill="#fff8dc"
-                                stroke="black"
+                                fill="#2a3140"
+                                stroke="#e6edf3"
+                                strokeWidth="1.5"
                             />
 
                             {/* NEXT BOX */}
@@ -140,8 +147,9 @@ export default function LinkedListDisplay({
                                 y={pos.y - 25}
                                 width="30"
                                 height="50"
-                                fill="#f5f5f5"
-                                stroke="black"
+                                fill="#21262d"
+                                stroke="#e6edf3"
+                                strokeWidth="1.5"
                             />
 
                             {/* VALUE */}
@@ -149,6 +157,8 @@ export default function LinkedListDisplay({
                                 x={pos.x + 30}
                                 y={pos.y + 5}
                                 textAnchor="middle"
+                                fill="#e6edf3"
+                                fontWeight="bold"
                             >
                                 {node.value}
                             </text>
@@ -158,6 +168,7 @@ export default function LinkedListDisplay({
                                 x={pos.x + 75}
                                 y={pos.y + 5}
                                 textAnchor="middle"
+                                fill="#e6edf3"
                             >
                                 {node.next ? "•" : "X"}
                             </text>
@@ -167,7 +178,7 @@ export default function LinkedListDisplay({
                                 x={pos.x + 45}
                                 y={pos.y + 45}
                                 textAnchor="middle"
-                                fill="#666"
+                                fill="#9198a1"
                                 fontSize="12"
                             >
                                 {id}
@@ -193,7 +204,7 @@ export default function LinkedListDisplay({
                             x={pos.x + 120}
                             y={pos.y + 5}
                             fontWeight="bold"
-                            fill="#888"
+                            fill="#6e7681"
                         >
                             NULL
                         </text>

@@ -14,7 +14,7 @@ export default function GraphDisplay({ graph }) {
     return (
 
         <div className="graph-container">
-
+            <h3>Graph</h3>
             <svg className="graph-svg">
 
                 {/* EDGES */}
@@ -37,9 +37,9 @@ export default function GraphDisplay({ graph }) {
                                 y2={to.y}
                                 stroke={
                                     edge.color ??
-                                    (edge.highlighted ? "red" : "#555")
+                                    (edge.highlighted ? "#f85149" : "#4b5563")
                                 }
-                                strokeWidth={edge.highlighted ? 4 : 2}
+                                strokeWidth={edge.highlighted ? 3 : 1.5}
                             />
 
                             {edge.weight != null && (
@@ -48,7 +48,8 @@ export default function GraphDisplay({ graph }) {
                                     x={(from.x + to.x) / 2}
                                     y={(from.y + to.y) / 2 - 8}
                                     textAnchor="middle"
-                                    fontSize="14"
+                                    fontSize="13"
+                                    fill="#9198a1"
                                 >
                                     {edge.weight}
                                 </text>
@@ -80,13 +81,13 @@ export default function GraphDisplay({ graph }) {
                                 fill={
                                     node.color ??
                                     (node.highlighted
-                                        ? "orange"
+                                        ? "#d29922"
                                         : node.visited
-                                            ? "lightgreen"
-                                            : "#87CEFA")
+                                            ? "#3fb950"
+                                            : "#3b82f6")
                                 }
-                                stroke="black"
-                                strokeWidth="2"
+                                stroke="#e6edf3"
+                                strokeWidth="1.5"
                             />
 
                             <text
@@ -94,6 +95,7 @@ export default function GraphDisplay({ graph }) {
                                 y={pos.y + 5}
                                 textAnchor="middle"
                                 fontWeight="bold"
+                                fill="#0d1117"
                             >
                                 {node.value}
                             </text>
@@ -103,6 +105,7 @@ export default function GraphDisplay({ graph }) {
                                 y={pos.y - 35}
                                 textAnchor="middle"
                                 fontSize="12"
+                                fill="#9198a1"
                             >
                                 {id}
                             </text>
