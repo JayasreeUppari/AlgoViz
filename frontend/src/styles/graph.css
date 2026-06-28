@@ -1,0 +1,18 @@
+.visualizer > .graph-container {
+    width: 100%;
+    max-width: 700px;
+    height: 480px;
+    border: none;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-base);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.graph-svg {
+    width: 100%;
+    height: 100%;
+}

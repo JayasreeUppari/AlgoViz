@@ -1,0 +1,36 @@
+.hashmap-container {
+    margin: 0;
+}
+
+.hashmap-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-secondary);
+}
+
+.hashmap-table {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.hashmap-table td,
+.hashmap-table th {
+    border: 1px solid var(--border-subtle);
+    padding: 8px 16px;
+    color: var(--text-primary);
+}
+
+.hashmap-table th {
+    background: var(--bg-panel-alt);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+}
+
+.hashmap-table tr:nth-child(even) td {
+    background: var(--bg-panel-alt);
+}
