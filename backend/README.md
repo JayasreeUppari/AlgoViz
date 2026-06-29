@@ -58,17 +58,13 @@ diff your real output against it.
 ✅ Graphs (`GRAPH_*`) 
 ✅  Trees (`TREE_*`)
 
-## What's NOT covered yet (next milestones, in priority order per your goals)
 
-⬜ Linked lists (`LIST_*`)
-⬜ HashMap / HashSet (`MAP_*`, `SET_ADD`/`SET_REMOVE`)
-⬜ Matrix (`MATRIX_*`)
-⬜ Branch visualization (`ENTER_IF`/`EXIT_IF`/`ENTER_ELSE`/`EXIT_ELSE`) — engine
+✅ Linked lists (`LIST_*`)
+✅ HashMap / HashSet (`MAP_*`, `SET_ADD`/`SET_REMOVE`)
+✅ Matrix (`MATRIX_*`)
+✅ Branch visualization (`ENTER_IF`/`EXIT_IF`/`ENTER_ELSE`/`EXIT_ELSE`) — engine
    supports it, nothing emits it yet.
 
-To add any of these: follow the exact same 3-step pattern used for arrays —
-(1) add methods to `Trace.java`, (2) document them + add a worked example in
-`instrumentationPrompt.js`, (3) add arity/reference rules to `dslValidator.js`.
 
 ## Known limitations (read before deploying with real users)
 
