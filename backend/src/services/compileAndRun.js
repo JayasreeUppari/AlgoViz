@@ -97,10 +97,18 @@ export async function compileAndRun(instrumentedJavaSource) {
 
     // ---- COMPILE ----
     const compileResult = await runProcess(
-      "javac",
-      ["Main.java", "Trace.java"],
-      { cwd: dir, timeoutMs: COMPILE_TIMEOUT_MS }
-    );
+    "javac",
+    [
+      "-encoding",
+      "UTF-8",
+      "Main.java",
+      "Trace.java"
+    ],
+    {
+      cwd: dir,
+      timeoutMs: COMPILE_TIMEOUT_MS,
+    }
+  );
 
     if (compileResult.timedOut) {
       return { ok: false, stage: "compile", error: "Compilation timed out." };
