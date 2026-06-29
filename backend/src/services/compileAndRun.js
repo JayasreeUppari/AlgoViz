@@ -122,10 +122,19 @@ export async function compileAndRun(instrumentedJavaSource) {
     }
 
     // ---- RUN ----
-    const runResult = await runProcess("java", ["-cp", dir, "Main"], {
+    const runResult = await runProcess(
+    "java",
+    [
+      "-Dfile.encoding=UTF-8",
+      "-cp",
+      dir,
+      "Main"
+    ],
+    {
       cwd: dir,
       timeoutMs: RUN_TIMEOUT_MS,
-    });
+    }
+  );
 
     if (runResult.timedOut) {
       return {
