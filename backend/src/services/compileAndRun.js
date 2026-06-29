@@ -24,7 +24,11 @@ function runProcess(cmd, args, { cwd, timeoutMs, input = null }) {
       // No shell, no inherited env secrets beyond what's needed, no network
       // assumptions here — true network isolation should be enforced at the
       // container/OS level wherever this backend is actually deployed.
-      env: { PATH: process.env.PATH },
+      env: {
+          ...process.env,
+          LANG: "C.UTF-8",
+          LC_ALL: "C.UTF-8",
+      },
     });
 
     let stdout = "";
