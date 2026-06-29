@@ -32,7 +32,6 @@ SET y 100
   // =========================
   // JAVA -> DSL (AI layer)
   // =========================
-  const [inputMode, setInputMode] = useState("dsl"); // "dsl" | "java"
   const [javaCode, setJavaCode] = useState(
     `public class Main {\n    public static void main(String[] args) {\n        int[] arr = {5, 3, 8, 1, 7};\n        for (int i = 0; i < arr.length - 1; i++) {\n            for (int j = 0; j < arr.length - i - 1; j++) {\n                if (arr[j] > arr[j + 1]) {\n                    int temp = arr[j];\n                    arr[j] = arr[j + 1];\n                    arr[j + 1] = temp;\n                }\n            }\n        }\n    }\n}\n`
   );
@@ -133,10 +132,6 @@ SET y 100
     hashSet: rawState.hashSet || {}
   };
 
-  // currentLine is tracked directly by stateEngine (state.currentLine),
-  // reflecting the DSL source line of the most recently applied event.
-  const currentLine = rawState.currentLine ?? null;
-
   const currentEvent = steps[current];
 
   // =========================
@@ -211,20 +206,6 @@ SET y 100
     );
 
   // =========================
-  // LINE NUMBER GUTTER (for the DSL Input editor)
-  // Keeps the gutter scroll position synced with the textarea.
-  // =========================
-  const gutterRef = useRef(null);
-  const textareaRef = useRef(null);
-  const codeLines = code.split("\n");
-
-  const handleEditorScroll = () => {
-    if (gutterRef.current && textareaRef.current) {
-      gutterRef.current.scrollTop = textareaRef.current.scrollTop;
-    }
-  };
-
-  // =========================
   // UI
   // =========================
 
@@ -232,76 +213,32 @@ SET y 100
     <div className="app">
       <h1 className="title">AlgoViz</h1>
 
-      {/* LEFT COLUMN: input + DSL panels, RIGHT: visualizer happens below */}
+      {/* LEFT: Java input, RIGHT: generated DSL — visualizer happens below */}
       <div className="editor-section">
         <div className="panel">
-          {/* TABS — switches which editor is shown below, inside the same panel */}
-          <div className="tab-row">
-            <button
-              className={"tab" + (inputMode === "dsl" ? " tab--active" : "")}
-              onClick={() => setInputMode("dsl")}
-            >
-              DSL
-            </button>
-            <button
-              className={"tab" + (inputMode === "java" ? " tab--active" : "")}
-              onClick={() => setInputMode("java")}
-            >
-              Java
-            </button>
-          </div>
+          <h3>Java Input</h3>
+          <textarea
+            className="editor editor--java"
+            value={javaCode}
+            onChange={(e) => setJavaCode(e.target.value)}
+            spellCheck={false}
+          />
+          <button
+            className="convert-btn"
+            onClick={convertJavaAndVisualize}
+            disabled={aiLoading}
+          >
+            {aiLoading ? "Running your code…" : "Convert & Visualize"}
+          </button>
 
-          {inputMode === "dsl" && (
-            <div className="editor-wrap">
-              <div className="line-gutter" ref={gutterRef}>
-                {codeLines.map((_, idx) => (
-                  <div
-                    key={idx}
-                    className={
-                      "line-number" +
-                      (currentLine === idx ? " line-number--active" : "")
-                    }
-                  >
-                    {idx + 1}
-                  </div>
-                ))}
-              </div>
-              <textarea
-                ref={textareaRef}
-                className="editor"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                onScroll={handleEditorScroll}
-                spellCheck={false}
-              />
-            </div>
-          )}
+          <p className="hint-text">
+            Compiled and run for real — not guessed. Supports arrays,
+            pointers, stacks, queues, variables, recursion, graphs, trees,
+            linked lists, hashmap/hashset, and matrices.
+          </p>
 
-          {inputMode === "java" && (
-            <>
-              <textarea
-                className="editor editor--java"
-                value={javaCode}
-                onChange={(e) => setJavaCode(e.target.value)}
-                spellCheck={false}
-              />
-              <button
-                className="convert-btn"
-                onClick={convertJavaAndVisualize}
-                disabled={aiLoading}
-              >
-                {aiLoading ? "Running your code…" : "Convert & Visualize"}
-              </button>
-
-              <p className="hint-text">
-                Compiled and run for real — not guessed. Supports arrays,
-                pointers, stacks, queues, variables, simple recursion.
-              </p>
-
-              {aiError && <p className="feedback-text feedback-text--error">{aiError}</p>}
-              {aiNote && <p className="feedback-text feedback-text--note">{aiNote}</p>}
-            </>
-          )}
+          {aiError && <p className="feedback-text feedback-text--error">{aiError}</p>}
+          {aiNote && <p className="feedback-text feedback-text--note">{aiNote}</p>}
         </div>
 
         {/* DSL OUTPUT — shows what the Java was actually traced to */}
